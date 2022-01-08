@@ -1,3 +1,4 @@
+[![](https://jitpack.io/v/byteful/datastore.svg)](https://jitpack.io/#byteful/datastore)
 # datastore
 A simple, quick way to manage persistent data in Java.
 
