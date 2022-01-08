@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group 'me.byteful.lib.datastore'
+version '1.0.0'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    compileOnly 'org.jetbrains:annotations:22.0.0'
+
+    implementation 'com.zaxxer:HikariCP:4.0.3'
+    implementation 'mysql:mysql-connector-java:8.0.26'
+    implementation project(":api")
+}
+
+shadowJar {
+    archiveClassifier.set("")
+}
+
+java {
+    disableAutoTargetJvm()
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'me.byteful.lib.datastore'
+            artifactId = 'mysql'
+            version = '1.0.0'
+            artifacts = [ shadowJar, javadocJar, sourcesJar ]
+        }
+    }
+}
