@@ -1,4 +1,5 @@
 [![](https://jitpack.io/v/byteful/datastore.svg)](https://jitpack.io/#byteful/datastore)
+[![Discord](https://img.shields.io/discord/911029017472270357?color=7289da&logo=discord)](https://discord.gg/G8BDgqsuyw)
 # datastore
 A simple, quick way to manage persistent data in Java.
 
