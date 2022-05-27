@@ -1,5 +1,5 @@
 plugins {
-    id 'java-library'
+    id 'java'
     id 'idea'
     id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
@@ -19,7 +19,8 @@ repositories {
 dependencies {
     compileOnly 'org.jetbrains:annotations:23.0.0'
 
-    api 'com.google.code.gson:gson:2.8.9'
+    implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
+    implementation project(":api")
 }
 
 shadowJar {
@@ -36,7 +37,7 @@ publishing {
     publications {
         maven(MavenPublication) {
             groupId = 'me.byteful.lib.datastore'
-            artifactId = 'api'
+            artifactId = 'sqlite'
             version = '1.0.1'
             artifacts = [ shadowJar, javadocJar, sourcesJar ]
         }
