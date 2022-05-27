@@ -204,23 +204,21 @@ public class SQLiteDataStore implements DataStore {
 
   private void runInsertSql(
     @NotNull Connection connection, @NotNull String table, @NotNull ProcessedModel model) {
-    final List<String> keys = new ArrayList<>(), combined = new ArrayList<>();
+    final List<String> keys = new ArrayList<>();
 
     model
       .values()
       .forEach(
         (k, v) -> {
           keys.add(k);
-          combined.add(k + "=?");
         });
 
     final String sql =
       String.format(
-        "insert into %s (%s) values (%s) on conflict update %s;",
+        "replace into %s (%s) values (%s);",
         table,
         String.join(",", keys),
-        String.join(",", Collections.nCopies(keys.size(), "?")),
-        String.join(",", combined));
+        String.join(",", Collections.nCopies(keys.size(), "?")));
 
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
       for (int i = 1; i < keys.size() + 1; i++) {
