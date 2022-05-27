@@ -9,7 +9,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group 'me.byteful.lib.datastore'
-version '1.0.0'
+version '1.0.2'
 
 repositories {
     mavenCentral()
@@ -37,7 +37,7 @@ publishing {
         maven(MavenPublication) {
             groupId = 'me.byteful.lib.datastore'
             artifactId = 'api'
-            version = '1.0.1'
+            version = '1.0.2'
             artifacts = [ shadowJar, javadocJar, sourcesJar ]
         }
     }

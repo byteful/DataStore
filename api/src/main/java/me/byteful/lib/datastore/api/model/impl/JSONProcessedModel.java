@@ -71,12 +71,6 @@ public class JSONProcessedModel implements ProcessedModel, Cloneable {
   @Override
   public @NotNull ProcessedModel append(
       @NotNull String key, @NotNull ProcessedModelFieldType fieldType, @Nullable Object value) {
-    if (value == null) {
-      data.put(key, null);
-
-      return this;
-    }
-
     data.put(key, JSONProcessedModelField.of(key, value, fieldType));
 
     return this;
