@@ -177,7 +177,7 @@ public class SQLiteDataStore implements DataStore {
     final String sql =
       String.format("select * from %s where %s;", table, String.join(" and ", list));
 
-    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+    try (PreparedStatement statement = connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
       for (int i = 1; i < ids.length + 1; i++) {
         statement.setString(i, ids[i - 1].value());
       }
