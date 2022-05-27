@@ -99,7 +99,7 @@ public class SQLiteDataStore implements DataStore {
 
   private void createTableIfNotExists(
     @NotNull Connection connection, @NotNull String tableName, @NotNull ProcessedModel model) {
-    final List<String> list = new ArrayList<>(), indexes = new ArrayList<>();
+    final List<String> list = new ArrayList<>(), indexes = new ArrayList<>(), uniqueIndexes = new ArrayList<>();
     for (ProcessedModelField field : model.values().values()) {
       String data = field.key() + " text";
 
@@ -107,7 +107,7 @@ public class SQLiteDataStore implements DataStore {
         indexes.add(field.key());
       } else if (field.type() == ProcessedModelFieldType.UNIQUE_INDEXED) {
         data = field.key() + " text unique";
-        indexes.add(field.key());
+        uniqueIndexes.add(field.key());
       }
 
       list.add(data);
@@ -127,7 +127,17 @@ public class SQLiteDataStore implements DataStore {
     }
 
     for (String index : indexes) {
-      sql = String.format("create index index_%s on %s (%s);", index, tableName, index);
+      sql = String.format("create index if not exists index_%s on %s (%s);", index, tableName, index);
+
+      try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        statement.execute();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
+
+    for (String index : uniqueIndexes) {
+      sql = String.format("create unique index if not exists index_%s on %s (%s);", index, tableName, index);
 
       try (PreparedStatement statement = connection.prepareStatement(sql)) {
         statement.execute();
@@ -206,7 +216,7 @@ public class SQLiteDataStore implements DataStore {
 
     final String sql =
       String.format(
-        "insert into %s (%s) values (%s) on duplicate key update %s;",
+        "insert into %s (%s) values (%s) on conflict update %s;",
         table,
         String.join(",", keys),
         String.join(",", Collections.nCopies(keys.size(), "?")),
