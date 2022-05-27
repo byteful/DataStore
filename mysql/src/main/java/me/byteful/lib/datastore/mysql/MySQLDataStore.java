@@ -140,12 +140,12 @@ public class MySQLDataStore implements DataStore {
       @NotNull Connection connection, @NotNull String tableName, @NotNull ProcessedModel model) {
     final List<String> list = new ArrayList<>(), indexes = new ArrayList<>(), uniqueIndexes = new ArrayList<>();
     for (ProcessedModelField field : model.values().values()) {
-      String data = field.key() + " text";
+      String data = field.key() + " varchar(255)";
 
       if (field.type() == ProcessedModelFieldType.INDEXED) {
         indexes.add(field.key());
       } else if (field.type() == ProcessedModelFieldType.UNIQUE_INDEXED) {
-        data = field.key() + " text unique";
+        data += " unique";
         uniqueIndexes.add(field.key());
       }
 
