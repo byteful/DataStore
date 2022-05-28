@@ -7,6 +7,7 @@ import me.byteful.lib.datastore.api.model.ModelStructure;
 import me.byteful.lib.datastore.api.model.ProcessedModel;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface DataStore extends AutoCloseable {
@@ -14,12 +15,17 @@ public interface DataStore extends AutoCloseable {
   <T extends Model> Optional<T> get(
       @NotNull Class<T> type, @NotNull ModelId id, @NotNull ModelId... ids);
 
+  @NotNull
+  <T extends Model> List<T> getAll(@NotNull Class<T> type);
+
   void set(@NotNull ModelId id, @NotNull Model model);
 
   boolean exists(
       @NotNull Class<? extends Model> type, @NotNull ModelId id, @NotNull ModelId... ids);
 
   void delete(@NotNull Class<? extends Model> type, @NotNull ModelId id, @NotNull ModelId... ids);
+
+  void clear(@NotNull Class<? extends Model> type);
 
   @NotNull
   default ProcessedModel serializeModel(@NotNull Model model) {

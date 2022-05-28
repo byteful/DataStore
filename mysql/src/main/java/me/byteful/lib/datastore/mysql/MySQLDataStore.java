@@ -10,10 +10,7 @@ import me.byteful.lib.datastore.api.model.impl.JSONProcessedModel;
 import me.byteful.lib.datastore.api.model.impl.JSONProcessedModelField;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 public class MySQLDataStore implements DataStore {
@@ -100,6 +97,36 @@ public class MySQLDataStore implements DataStore {
   }
 
   @Override
+  public @NotNull <T extends Model> List<T> getAll(@NotNull Class<T> type) {
+    final String table = getStoredGroup(type);
+    final List<T> list = new ArrayList<>();
+
+    try (Connection conn = pool.getConnection()) {
+      if (tableNotExists(conn, table)) {
+        return list;
+      }
+
+      final List<Map<String, String>> data = runSelectAllQuery(conn, table);
+
+      if (data == null) {
+        return list;
+      }
+
+      for (Map<String, String> map : data) {
+        final JSONProcessedModel processed = new JSONProcessedModel(gson);
+        map.forEach((k, v) ->
+          processed.append(
+            JSONProcessedModelField.of(k, v, ProcessedModelFieldType.NORMAL)));
+        list.add(deserializeModel(type, processed));
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return list;
+  }
+
+  @Override
   public void set(@NotNull ModelId id, @NotNull Model model) {
     final ProcessedModel processed = serializeModel(model);
     final String table = getStoredGroup(model.getClass());
@@ -131,6 +158,18 @@ public class MySQLDataStore implements DataStore {
       }
 
       runDeleteSql(conn, table, compiled);
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void clear(@NotNull Class<? extends Model> type) {
+    final String table = getStoredGroup(type);
+    final String sql = String.format("truncate table %s;", table);
+
+    try (Connection conn = pool.getConnection(); PreparedStatement statement = conn.prepareStatement(sql)) {
+      statement.execute();
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -225,14 +264,43 @@ public class MySQLDataStore implements DataStore {
         if (rs.first()) {
           final Map<String, String> map = new HashMap<>();
 
-          for (String s : list) {
-            map.put(s, rs.getString(s));
+          final ResultSetMetaData meta = rs.getMetaData();
+          for (int i = 1; i <= meta.getColumnCount(); i++) {
+            map.put(meta.getColumnName(i), rs.getString(i));
           }
 
           return map;
         } else {
           return null;
         }
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return null;
+  }
+
+  private List<Map<String, String>> runSelectAllQuery(
+    @NotNull Connection connection, @NotNull String table) {
+    final String sql =
+      String.format("select * from %s;", table);
+
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      try (ResultSet rs = statement.executeQuery()) {
+        final List<Map<String, String>> data = new ArrayList<>();
+        while(rs.next()) {
+          final Map<String, String> map = new HashMap<>();
+
+          final ResultSetMetaData meta = rs.getMetaData();
+          for (int i = 1; i <= meta.getColumnCount(); i++) {
+            map.put(meta.getColumnName(i), rs.getString(i));
+          }
+
+          data.add(map);
+        }
+
+        return data;
       }
     } catch (SQLException e) {
       e.printStackTrace();
