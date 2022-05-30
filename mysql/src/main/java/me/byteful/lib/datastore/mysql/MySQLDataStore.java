@@ -2,6 +2,7 @@ package me.byteful.lib.datastore.mysql;
 
 import com.google.gson.Gson;
 import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
 import me.byteful.lib.datastore.api.DataStoreConstants;
 import me.byteful.lib.datastore.api.data.DataStore;
@@ -14,15 +15,15 @@ import java.sql.*;
 import java.util.*;
 
 public class MySQLDataStore implements DataStore {
-  private final HikariPool pool;
+  private final HikariDataSource pool;
   private final Gson gson;
 
   public MySQLDataStore(@NotNull HikariConfig hikariConfig) {
-    this.pool = new HikariPool(hikariConfig);
+    this.pool = new HikariDataSource(hikariConfig);
     this.gson = DataStoreConstants.GSON;
   }
 
-  public MySQLDataStore(@NotNull HikariPool pool) {
+  public MySQLDataStore(@NotNull HikariDataSource pool) {
     this.pool = pool;
     this.gson = DataStoreConstants.GSON;
   }
@@ -33,23 +34,23 @@ public class MySQLDataStore implements DataStore {
       @NotNull String user,
       @NotNull String password,
       @NotNull String database) {
-    this(String.format("mysql://%s:%s@%s:%s/%s", user, password, host, port, database), DataStoreConstants.GSON);
+    this(String.format("jdbc:mysql://%s:%s/%s", host, port, database), user, password, DataStoreConstants.GSON);
   }
 
-  public MySQLDataStore(@NotNull String uri, @NotNull Gson gson) {
+  public MySQLDataStore(@NotNull String uri, @NotNull String user, @NotNull String pass, @NotNull Gson gson) {
     final HikariConfig config = new HikariConfig();
     config.setJdbcUrl(uri);
 
-    this.pool = new HikariPool(config);
+    this.pool = new HikariDataSource(config);
     this.gson = gson;
   }
 
   public MySQLDataStore(@NotNull HikariConfig hikariConfig, @NotNull Gson gson) {
-    this.pool = new HikariPool(hikariConfig);
+    this.pool = new HikariDataSource(hikariConfig);
     this.gson = gson;
   }
 
-  public MySQLDataStore(@NotNull HikariPool pool, @NotNull Gson gson) {
+  public MySQLDataStore(@NotNull HikariDataSource pool, @NotNull Gson gson) {
     this.pool = pool;
     this.gson = gson;
   }
@@ -61,7 +62,7 @@ public class MySQLDataStore implements DataStore {
       @NotNull String password,
       @NotNull String database,
       @NotNull Gson gson) {
-    this(String.format("mysql://%s:%s@%s:%s/%s", user, password, host, port, database), gson);
+    this(String.format("jdbc:mysql://%s:%s/%s", host, port, database), user, password, gson);
   }
 
   @Override
@@ -357,6 +358,6 @@ public class MySQLDataStore implements DataStore {
 
   @Override
   public void close() throws Exception {
-    pool.shutdown();
+    pool.close();
   }
 }
