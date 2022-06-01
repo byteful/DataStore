@@ -351,7 +351,7 @@ public class MySQLDataStore implements DataStore {
       for (int i = keys.size() + 1; i <= (keys.size() * 2); i++) {
         int finalI = i;
         model
-          .getField(keys.get(keys.size() * 2 - i - 2))
+          .getField(keys.get(Math.abs(keys.size() - i)))
           .ifPresent(
             field -> {
               try {
