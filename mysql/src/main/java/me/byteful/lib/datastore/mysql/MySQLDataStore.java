@@ -348,10 +348,10 @@ public class MySQLDataStore implements DataStore {
                   }
                 });
       }
-      for (int i = keys.size(); i <= keys.size() * 2; i++) {
+      for (int i = keys.size() + 1; i <= (keys.size() * 2); i++) {
         int finalI = i;
         model
-          .getField(keys.get((keys.size() * 2) - i))
+          .getField(keys.get(keys.size() * 2 - i - 2))
           .ifPresent(
             field -> {
               try {
