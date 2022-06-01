@@ -170,6 +170,10 @@ public class MySQLDataStore implements DataStore {
     final String sql = String.format("truncate table %s;", table);
 
     try (Connection conn = pool.getConnection(); PreparedStatement statement = conn.prepareStatement(sql)) {
+      if(tableNotExists(conn, table)) {
+        return;
+      }
+
       statement.execute();
     } catch (SQLException e) {
       e.printStackTrace();
