@@ -335,7 +335,7 @@ public class MySQLDataStore implements DataStore {
             String.join(",", combined));
 
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
-      for (int i = 1; i < keys.size() + 1; i++) {
+      for (int i = 1; i <= keys.size(); i++) {
         int finalI = i;
         model
             .getField(keys.get(i - 1))
@@ -347,6 +347,19 @@ public class MySQLDataStore implements DataStore {
                     e.printStackTrace();
                   }
                 });
+      }
+      for (int i = keys.size(); i <= keys.size() * 2; i++) {
+        int finalI = i;
+        model
+          .getField(keys.get(keys.size() - i))
+          .ifPresent(
+            field -> {
+              try {
+                statement.setString(finalI, field.value());
+              } catch (SQLException e) {
+                e.printStackTrace();
+              }
+            });
       }
 
       statement.execute();
