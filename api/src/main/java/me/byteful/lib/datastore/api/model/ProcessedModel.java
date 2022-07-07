@@ -13,22 +13,18 @@ public interface ProcessedModel {
 
   @NotNull
   ProcessedModel append(
-      @NotNull String key, @NotNull ProcessedModelFieldType fieldType, @Nullable Object value);
+    @NotNull String key, @NotNull ProcessedModelFieldType fieldType, @Nullable Object value);
 
   @NotNull
   ProcessedModel append(@NotNull ProcessedModelField field);
 
-  @NotNull
-  <T> Optional<T> get(@NotNull String key, @NotNull Class<T> type);
+  @NotNull <T> Optional<T> get(@NotNull String key, @NotNull Class<T> type);
 
-  @Nullable
-  <T> T getNullable(@NotNull String key, @NotNull Class<T> type);
+  @Nullable <T> T getNullable(@NotNull String key, @NotNull Class<T> type);
 
-  @NotNull
-  <T> Optional<T> get(@NotNull String key, @NotNull Type type);
+  @NotNull <T> Optional<T> get(@NotNull String key, @NotNull Type type);
 
-  @Nullable
-  <T> T getNullable(@NotNull String key, @NotNull Type type);
+  @Nullable <T> T getNullable(@NotNull String key, @NotNull Type type);
 
   @NotNull
   Optional<ProcessedModelField> getField(@NotNull String key);

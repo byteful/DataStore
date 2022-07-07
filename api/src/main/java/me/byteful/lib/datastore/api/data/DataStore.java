@@ -11,17 +11,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DataStore extends AutoCloseable {
-  @NotNull
-  <T extends Model> Optional<T> get(
-      @NotNull Class<T> type, @NotNull ModelId id, @NotNull ModelId... ids);
+  @NotNull <T extends Model> Optional<T> get(
+    @NotNull Class<T> type, @NotNull ModelId id, @NotNull ModelId... ids);
 
-  @NotNull
-  <T extends Model> List<T> getAll(@NotNull Class<T> type);
+  @NotNull <T extends Model> List<T> getAll(@NotNull Class<T> type);
 
   void set(@NotNull ModelId id, @NotNull Model model);
 
   boolean exists(
-      @NotNull Class<? extends Model> type, @NotNull ModelId id, @NotNull ModelId... ids);
+    @NotNull Class<? extends Model> type, @NotNull ModelId id, @NotNull ModelId... ids);
 
   void delete(@NotNull Class<? extends Model> type, @NotNull ModelId id, @NotNull ModelId... ids);
 
@@ -30,13 +28,13 @@ public interface DataStore extends AutoCloseable {
   @NotNull
   default ProcessedModel serializeModel(@NotNull Model model) {
     final ModelStructure<Model> structure =
-        ModelManager.getStructureFromClass((Class<Model>) model.getClass());
+      ModelManager.getStructureFromClass((Class<Model>) model.getClass());
 
     if (structure == null) {
       throw new RuntimeException(
-          "Model structure for model type ("
-              + model.getClass().getName()
-              + ") was not registered! Please use ModelManager to register structures for models.");
+        "Model structure for model type ("
+          + model.getClass().getName()
+          + ") was not registered! Please use ModelManager to register structures for models.");
     }
 
     return structure.serialize(model);
@@ -44,14 +42,14 @@ public interface DataStore extends AutoCloseable {
 
   @NotNull
   default <T extends Model> T deserializeModel(
-      @NotNull Class<T> type, @NotNull ProcessedModel processed) {
+    @NotNull Class<T> type, @NotNull ProcessedModel processed) {
     final ModelStructure<T> structure = ModelManager.getStructureFromClass(type);
 
     if (structure == null) {
       throw new RuntimeException(
-          "Model structure for model type ("
-              + type.getName()
-              + ") was not registered! Please use ModelManager to register structures for models.");
+        "Model structure for model type ("
+          + type.getName()
+          + ") was not registered! Please use ModelManager to register structures for models.");
     }
 
     return structure.deserialize(processed);
@@ -77,11 +75,11 @@ public interface DataStore extends AutoCloseable {
       return group.value();
     } else {
       System.out.println(
-          "[WARNING] DataStore detected a class ("
-              + type.getName()
-              + ") that has no "
-              + StoredGroup.class.getSimpleName()
-              + " annotation! Using group 'default' instead...");
+        "[WARNING] DataStore detected a class ("
+          + type.getName()
+          + ") that has no "
+          + StoredGroup.class.getSimpleName()
+          + " annotation! Using group 'default' instead...");
 
       return "default";
     }

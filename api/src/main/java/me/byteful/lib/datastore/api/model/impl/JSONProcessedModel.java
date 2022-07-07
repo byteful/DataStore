@@ -50,7 +50,7 @@ public class JSONProcessedModel implements ProcessedModel, Cloneable {
   }
 
   public JSONProcessedModel(
-      @NotNull final Map<String, ProcessedModelField> data, @NotNull final Gson gson) {
+    @NotNull final Map<String, ProcessedModelField> data, @NotNull final Gson gson) {
     this.gson = gson;
     this.data = new HashMap<>(data);
   }
@@ -70,7 +70,7 @@ public class JSONProcessedModel implements ProcessedModel, Cloneable {
 
   @Override
   public @NotNull ProcessedModel append(
-      @NotNull String key, @NotNull ProcessedModelFieldType fieldType, @Nullable Object value) {
+    @NotNull String key, @NotNull ProcessedModelFieldType fieldType, @Nullable Object value) {
     data.put(key, JSONProcessedModelField.of(key, value, fieldType));
 
     return this;
@@ -82,9 +82,9 @@ public class JSONProcessedModel implements ProcessedModel, Cloneable {
       data.put(field.key(), field);
     } else {
       throw new IllegalArgumentException(
-          field.getClass().getName()
-              + " is not a subclass of "
-              + JSONProcessedModelField.class.getName());
+        field.getClass().getName()
+          + " is not a subclass of "
+          + JSONProcessedModelField.class.getName());
     }
 
     return this;
@@ -131,10 +131,10 @@ public class JSONProcessedModel implements ProcessedModel, Cloneable {
 
     try {
       gson.fromJson(
-          data.get(key).value(),
-          type); // Yes, exception catching is bad... But I have not been able to find a valid
-                 // method in GSON that lets me check if it's the correct type. Please make a PR if
-                 // you do know of this method!
+        data.get(key).value(),
+        type); // Yes, exception catching is bad... But I have not been able to find a valid
+      // method in GSON that lets me check if it's the correct type. Please make a PR if
+      // you do know of this method!
 
       b = true;
     } catch (Exception ignored) {

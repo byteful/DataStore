@@ -11,7 +11,7 @@ import java.util.Map;
 public final class ModelManager {
   @NotNull
   private static final Map<Class<? extends Model>, ModelStructure<?>> mappedModels =
-      new HashMap<>();
+    new HashMap<>();
 
   public static void registerModelStructure(@NotNull ModelStructure<?> structure) {
     mappedModels.put(structure.getModelType(), structure);

@@ -8,7 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public class JSONModelId implements ModelId, Cloneable {
-  @NotNull private final String key, value;
+  @NotNull
+  private final String key, value;
 
   private JSONModelId(@NotNull final String key, @NotNull final String value) {
     this.key = key;
@@ -24,7 +25,7 @@ public class JSONModelId implements ModelId, Cloneable {
   }
 
   public static JSONModelId of(
-      @NotNull final String key, @NotNull final Object value, @NotNull final Gson gson) {
+    @NotNull final String key, @NotNull final Object value, @NotNull final Gson gson) {
     return new JSONModelId(key, gson.toJson(value));
   }
 

@@ -3,7 +3,6 @@ package me.byteful.lib.datastore.mysql;
 import com.google.gson.Gson;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import com.zaxxer.hikari.pool.HikariPool;
 import me.byteful.lib.datastore.api.DataStoreConstants;
 import me.byteful.lib.datastore.api.data.DataStore;
 import me.byteful.lib.datastore.api.model.*;
@@ -29,11 +28,11 @@ public class MySQLDataStore implements DataStore {
   }
 
   public MySQLDataStore(
-      @NotNull String host,
-      int port,
-      @NotNull String user,
-      @NotNull String password,
-      @NotNull String database) {
+    @NotNull String host,
+    int port,
+    @NotNull String user,
+    @NotNull String password,
+    @NotNull String database) {
     this(String.format("jdbc:mysql://%s:%s/%s", host, port, database), user, password, DataStoreConstants.GSON);
   }
 
@@ -56,18 +55,18 @@ public class MySQLDataStore implements DataStore {
   }
 
   public MySQLDataStore(
-      @NotNull String host,
-      int port,
-      @NotNull String user,
-      @NotNull String password,
-      @NotNull String database,
-      @NotNull Gson gson) {
+    @NotNull String host,
+    int port,
+    @NotNull String user,
+    @NotNull String password,
+    @NotNull String database,
+    @NotNull Gson gson) {
     this(String.format("jdbc:mysql://%s:%s/%s", host, port, database), user, password, gson);
   }
 
   @Override
   public @NotNull <T extends Model> Optional<T> get(
-      @NotNull Class<T> type, @NotNull ModelId id, @NotNull ModelId... ids) {
+    @NotNull Class<T> type, @NotNull ModelId id, @NotNull ModelId... ids) {
     final String table = getStoredGroup(type);
     final @NotNull ModelId[] compiled = compile(id, ids);
 
@@ -84,10 +83,10 @@ public class MySQLDataStore implements DataStore {
 
       final JSONProcessedModel processed = new JSONProcessedModel(gson);
       Objects.requireNonNull(data)
-          .forEach(
-              (k, v) ->
-                  processed.append(
-                      JSONProcessedModelField.of(k, v, ProcessedModelFieldType.NORMAL)));
+        .forEach(
+          (k, v) ->
+            processed.append(
+              JSONProcessedModelField.of(k, v, ProcessedModelFieldType.NORMAL)));
 
       return Optional.of(deserializeModel(type, processed));
     } catch (SQLException e) {
@@ -143,13 +142,13 @@ public class MySQLDataStore implements DataStore {
 
   @Override
   public boolean exists(
-      @NotNull Class<? extends Model> type, @NotNull ModelId id, @NotNull ModelId... ids) {
+    @NotNull Class<? extends Model> type, @NotNull ModelId id, @NotNull ModelId... ids) {
     return get(type, id, ids).isPresent(); // TODO: UPDATE TO A BETTER EXISTS METHOD
   }
 
   @Override
   public void delete(
-      @NotNull Class<? extends Model> type, @NotNull ModelId id, @NotNull ModelId... ids) {
+    @NotNull Class<? extends Model> type, @NotNull ModelId id, @NotNull ModelId... ids) {
     final String table = getStoredGroup(type);
     final @NotNull ModelId[] compiled = compile(id, ids);
 
@@ -170,7 +169,7 @@ public class MySQLDataStore implements DataStore {
     final String sql = String.format("truncate table %s;", table);
 
     try (Connection conn = pool.getConnection(); PreparedStatement statement = conn.prepareStatement(sql)) {
-      if(tableNotExists(conn, table)) {
+      if (tableNotExists(conn, table)) {
         return;
       }
 
@@ -181,7 +180,7 @@ public class MySQLDataStore implements DataStore {
   }
 
   private void createTableIfNotExists(
-      @NotNull Connection connection, @NotNull String tableName, @NotNull ProcessedModel model) {
+    @NotNull Connection connection, @NotNull String tableName, @NotNull ProcessedModel model) {
     final List<String> list = new ArrayList<>(), indexes = new ArrayList<>(), uniqueIndexes = new ArrayList<>();
     for (ProcessedModelField field : model.values().values()) {
       String data = field.key() + " varchar(255)";
@@ -197,7 +196,7 @@ public class MySQLDataStore implements DataStore {
     }
 
     String sql =
-        String.format("create table if not exists %s (%s);", tableName, String.join(",", list));
+      String.format("create table if not exists %s (%s);", tableName, String.join(",", list));
 
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
       statement.execute();
@@ -205,7 +204,7 @@ public class MySQLDataStore implements DataStore {
       e.printStackTrace();
     }
 
-    if(indexes.isEmpty()) {
+    if (indexes.isEmpty()) {
       return;
     }
 
@@ -231,7 +230,7 @@ public class MySQLDataStore implements DataStore {
   }
 
   private void runDeleteSql(
-      @NotNull Connection connection, @NotNull String table, @NotNull ModelId[] ids) {
+    @NotNull Connection connection, @NotNull String table, @NotNull ModelId[] ids) {
     final List<String> list = new ArrayList<>();
     for (ModelId id : ids) {
       list.add(id.key() + "=?");
@@ -251,14 +250,14 @@ public class MySQLDataStore implements DataStore {
   }
 
   private Map<String, String> runSelectQuery(
-      @NotNull Connection connection, @NotNull String table, @NotNull ModelId[] ids) {
+    @NotNull Connection connection, @NotNull String table, @NotNull ModelId[] ids) {
     final List<String> list = new ArrayList<>();
     for (ModelId id : ids) {
       list.add(id.key() + "=?");
     }
 
     final String sql =
-        String.format("select * from %s where %s;", table, String.join(" and ", list));
+      String.format("select * from %s where %s;", table, String.join(" and ", list));
 
     try (PreparedStatement statement = connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
       for (int i = 1; i < ids.length + 1; i++) {
@@ -294,7 +293,7 @@ public class MySQLDataStore implements DataStore {
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
       try (ResultSet rs = statement.executeQuery()) {
         final List<Map<String, String>> data = new ArrayList<>();
-        while(rs.next()) {
+        while (rs.next()) {
           final Map<String, String> map = new HashMap<>();
 
           final ResultSetMetaData meta = rs.getMetaData();
@@ -315,38 +314,38 @@ public class MySQLDataStore implements DataStore {
   }
 
   private void runInsertSql(
-      @NotNull Connection connection, @NotNull String table, @NotNull ProcessedModel model) {
+    @NotNull Connection connection, @NotNull String table, @NotNull ProcessedModel model) {
     final List<String> keys = new ArrayList<>(), combined = new ArrayList<>();
 
     model
-        .values()
-        .forEach(
-            (k, v) -> {
-              keys.add(k);
-              combined.add(k + "=?");
-            });
+      .values()
+      .forEach(
+        (k, v) -> {
+          keys.add(k);
+          combined.add(k + "=?");
+        });
 
     final String sql =
-        String.format(
-            "insert into %s (%s) values (%s) on duplicate key update %s;",
-            table,
-            String.join(",", keys),
-            String.join(",", Collections.nCopies(keys.size(), "?")),
-            String.join(",", combined));
+      String.format(
+        "insert into %s (%s) values (%s) on duplicate key update %s;",
+        table,
+        String.join(",", keys),
+        String.join(",", Collections.nCopies(keys.size(), "?")),
+        String.join(",", combined));
 
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
       for (int i = 1; i <= keys.size(); i++) {
         int finalI = i;
         model
-            .getField(keys.get(i - 1))
-            .ifPresent(
-                field -> {
-                  try {
-                    statement.setString(finalI, field.value());
-                  } catch (SQLException e) {
-                    e.printStackTrace();
-                  }
-                });
+          .getField(keys.get(i - 1))
+          .ifPresent(
+            field -> {
+              try {
+                statement.setString(finalI, field.value());
+              } catch (SQLException e) {
+                e.printStackTrace();
+              }
+            });
       }
       for (int i = keys.size() + 1; i <= (keys.size() * 2); i++) {
         int finalI = i;
@@ -369,7 +368,7 @@ public class MySQLDataStore implements DataStore {
   }
 
   private boolean tableNotExists(@NotNull Connection connection, @NotNull String table)
-      throws SQLException {
+    throws SQLException {
     return !connection.getMetaData().getTables(null, null, table, null).next();
   }
 

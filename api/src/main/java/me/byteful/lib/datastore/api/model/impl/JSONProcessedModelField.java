@@ -9,35 +9,37 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public class JSONProcessedModelField implements ProcessedModelField {
-  @NotNull private final String key, value;
-  @NotNull private final ProcessedModelFieldType type;
+  @NotNull
+  private final String key, value;
+  @NotNull
+  private final ProcessedModelFieldType type;
 
   private JSONProcessedModelField(
-      @NotNull String key, @NotNull String value, @NotNull ProcessedModelFieldType type) {
+    @NotNull String key, @NotNull String value, @NotNull ProcessedModelFieldType type) {
     this.key = key;
     this.value = value;
     this.type = type;
   }
 
   public static JSONProcessedModelField of(
-      @NotNull final String key,
-      @NotNull final String value,
-      @NotNull ProcessedModelFieldType type) {
+    @NotNull final String key,
+    @NotNull final String value,
+    @NotNull ProcessedModelFieldType type) {
     return new JSONProcessedModelField(key, value, type);
   }
 
   public static JSONProcessedModelField of(
-      @NotNull final String key,
-      @NotNull final Object value,
-      @NotNull ProcessedModelFieldType type) {
+    @NotNull final String key,
+    @NotNull final Object value,
+    @NotNull ProcessedModelFieldType type) {
     return new JSONProcessedModelField(key, DataStoreConstants.GSON.toJson(value), type);
   }
 
   public static JSONProcessedModelField of(
-      @NotNull final String key,
-      @NotNull final Object value,
-      @NotNull ProcessedModelFieldType type,
-      @NotNull final Gson gson) {
+    @NotNull final String key,
+    @NotNull final Object value,
+    @NotNull ProcessedModelFieldType type,
+    @NotNull final Gson gson) {
     return new JSONProcessedModelField(key, gson.toJson(value), type);
   }
 
@@ -59,15 +61,15 @@ public class JSONProcessedModelField implements ProcessedModelField {
   @Override
   public String toString() {
     return "JSONProcessedModelField{"
-        + "key='"
-        + key
-        + '\''
-        + ", value='"
-        + value
-        + '\''
-        + ", type="
-        + type
-        + '}';
+      + "key='"
+      + key
+      + '\''
+      + ", value='"
+      + value
+      + '\''
+      + ", type="
+      + type
+      + '}';
   }
 
   @Override

@@ -5,5 +5,5 @@ import com.google.gson.GsonBuilder;
 
 public final class DataStoreConstants {
   public static final Gson GSON =
-      new GsonBuilder().serializeNulls().disableHtmlEscaping().setLenient().create();
+    new GsonBuilder().serializeNulls().disableHtmlEscaping().setLenient().create();
 }

@@ -174,7 +174,7 @@ public class SQLiteDataStore implements DataStore {
       e.printStackTrace();
     }
 
-    if(indexes.isEmpty()) {
+    if (indexes.isEmpty()) {
       return;
     }
 
@@ -263,7 +263,7 @@ public class SQLiteDataStore implements DataStore {
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
       try (ResultSet rs = statement.executeQuery()) {
         final List<Map<String, String>> data = new ArrayList<>();
-        while(rs.next()) {
+        while (rs.next()) {
           final Map<String, String> map = new HashMap<>();
 
           final ResultSetMetaData meta = rs.getMetaData();
