@@ -16,6 +16,7 @@ import org.bson.conversions.Bson;
 import org.bson.json.JsonMode;
 import org.bson.json.JsonWriterSettings;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,10 +43,9 @@ public class MongoDBDataStore implements DataStore {
   @Override
   public @NotNull <T extends Model> Optional<T> get(@NotNull Class<T> type, @NotNull ModelId id, @NotNull ModelId... ids) {
     final String group = getStoredGroup(type);
-    final @NotNull ModelId[] compiled = compile(id, ids);
     final MongoCollection<Document> col = database.getCollection(group);
-    FindIterable<Document> find = col.find();
-    for (ModelId modelId : compiled) {
+    FindIterable<Document> find = col.find(Filters.eq(id.key(), id.value()));
+    for (ModelId modelId : ids) {
       find = find.filter(Filters.eq(modelId.key(), modelId.value()));
     }
 
@@ -58,11 +58,15 @@ public class MongoDBDataStore implements DataStore {
   }
 
   @Override
-  public @NotNull <T extends Model> List<T> getAll(@NotNull Class<T> type) {
+  public @NotNull <T extends Model> List<T> getAll(@NotNull Class<T> type, @NotNull ModelId... ids) {
     final String group = getStoredGroup(type);
     final List<T> list = new ArrayList<>();
     final MongoCollection<Document> col = database.getCollection(group);
-    col.find().forEach((Consumer<? super Document>) doc -> {
+    FindIterable<Document> find = col.find();
+    for (ModelId modelId : ids) {
+      find = find.filter(Filters.eq(modelId.key(), modelId.value()));
+    }
+    find.forEach((Consumer<? super Document>) doc -> {
       if (doc == null) {
         return;
       }

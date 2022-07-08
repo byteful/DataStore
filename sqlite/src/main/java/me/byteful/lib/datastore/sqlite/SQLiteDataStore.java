@@ -68,7 +68,7 @@ public class SQLiteDataStore implements DataStore {
   }
 
   @Override
-  public @NotNull <T extends Model> List<T> getAll(@NotNull Class<T> type) {
+  public @NotNull <T extends Model> List<T> getAll(@NotNull Class<T> type, @NotNull ModelId... ids) {
     final String table = getStoredGroup(type);
     final List<T> list = new ArrayList<>();
 
@@ -77,7 +77,7 @@ public class SQLiteDataStore implements DataStore {
         return list;
       }
 
-      final List<Map<String, String>> data = runSelectAllQuery(conn, table);
+      final List<Map<String, String>> data = runSelectAllQuery(conn, table, ids);
 
       if (data == null) {
         return list;
@@ -256,11 +256,26 @@ public class SQLiteDataStore implements DataStore {
   }
 
   private List<Map<String, String>> runSelectAllQuery(
-    @NotNull Connection connection, @NotNull String table) {
-    final String sql =
-      String.format("select * from %s;", table);
+    @NotNull Connection connection, @NotNull String table, @NotNull ModelId[] ids) {
+    String sql;
+    if(ids.length != 0) {
+      final List<String> list = new ArrayList<>();
+      for (ModelId id : ids) {
+        list.add(id.key() + "=?");
+      }
+
+      sql =
+        String.format("select * from %s where %s;", table, String.join(" and ", list));
+    } else {
+      sql =
+        String.format("select * from %s;", table);
+    }
 
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      for (int i = 0; i < ids.length; i++) {
+        ModelId id = ids[i];
+        statement.setString(i + 1, id.value());
+      }
       try (ResultSet rs = statement.executeQuery()) {
         final List<Map<String, String>> data = new ArrayList<>();
         while (rs.next()) {

@@ -6,6 +6,7 @@ import me.byteful.lib.datastore.api.model.ModelId;
 import me.byteful.lib.datastore.api.model.ModelStructure;
 import me.byteful.lib.datastore.api.model.ProcessedModel;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +15,7 @@ public interface DataStore extends AutoCloseable {
   @NotNull <T extends Model> Optional<T> get(
     @NotNull Class<T> type, @NotNull ModelId id, @NotNull ModelId... ids);
 
-  @NotNull <T extends Model> List<T> getAll(@NotNull Class<T> type);
+  @NotNull <T extends Model> List<T> getAll(@NotNull Class<T> type, @NotNull ModelId... ids);
 
   void set(@NotNull ModelId id, @NotNull Model model);
 
